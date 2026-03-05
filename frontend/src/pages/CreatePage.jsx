@@ -20,7 +20,7 @@ export default function CreatePage() {
     if (isEdit) {
       const fetchExpense = async () => {
         try {
-          const res = await axiosInstance.get(`/${id}`);
+          const res = await axiosInstance.get(`/expenses/${id}`);
           setForm(res.data);
         } catch (err) {
           toast.error("Failed to load expense");
@@ -28,20 +28,20 @@ export default function CreatePage() {
       };
       fetchExpense();
     }
-  }, [id]);
+  }, [id, isEdit]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       if (isEdit) {
-        await axiosInstance.put(`/${id}`, {
+        await axiosInstance.put(`/expenses/${id}`, {
           ...form,
           amount: Number(form.amount),
         });
         toast.success("Expense Updated");
       } else {
-        await axiosInstance.post("/", {
+        await axiosInstance.post("/expenses", {
           ...form,
           amount: Number(form.amount),
           year: new Date(form.date).getFullYear(),
@@ -58,10 +58,10 @@ export default function CreatePage() {
   return (
     <div className="form-bg">
       <div style={{ width: "320px" }}>
-        {/* 📦 Form */}
+        {/* FORM */}
         <form className="form-card" onSubmit={handleSubmit}>
           
-          {/* 🔴 Heading + Back Button */}
+          {/* Heading + Back Button */}
           <div className="flex items-center justify-between mb-3">
             <h2>{isEdit ? "Edit Expense" : "Add Expense"}</h2>
 
@@ -120,6 +120,7 @@ export default function CreatePage() {
           <button type="submit">
             {isEdit ? "Update Expense" : "Save Expense"}
           </button>
+
         </form>
       </div>
     </div>
