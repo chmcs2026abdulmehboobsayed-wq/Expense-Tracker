@@ -57,7 +57,7 @@ export default function HomePage() {
   expenses.forEach((item) => {
 
     const month = new Date(item.date).toLocaleString("default", {
-      month: "short",
+      month: "long",
     });
 
     monthlyTotals[month] = (monthlyTotals[month] || 0) + item.amount;
