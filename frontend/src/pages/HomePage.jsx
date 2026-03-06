@@ -22,7 +22,7 @@ export default function HomePage() {
     fetchExpenses();
   }, []);
 
-  // DELETE EXPENSE
+  // DELETE
   const handleDelete = async () => {
     try {
       await axiosInstance.delete(`/expenses/${deleteId}`);
@@ -34,7 +34,7 @@ export default function HomePage() {
     }
   };
 
-  // UPDATE EXPENSE
+  // UPDATE
   const handleUpdate = async (e) => {
     e.preventDefault();
 
@@ -51,21 +51,20 @@ export default function HomePage() {
   // TOTAL
   const total = expenses.reduce((sum, item) => sum + item.amount, 0);
 
-  // MONTHLY ANALYSIS
-  const monthlyTotals = {};
+  // MONTH + CATEGORY ANALYSIS
+  const monthlyCategory = {};
+
   expenses.forEach((item) => {
     const month = new Date(item.date).toLocaleString("default", {
       month: "short",
     });
 
-    monthlyTotals[month] = (monthlyTotals[month] || 0) + item.amount;
-  });
+    if (!monthlyCategory[month]) {
+      monthlyCategory[month] = {};
+    }
 
-  // CATEGORY ANALYSIS
-  const categoryTotals = {};
-  expenses.forEach((item) => {
-    categoryTotals[item.category] =
-      (categoryTotals[item.category] || 0) + item.amount;
+    monthlyCategory[month][item.category] =
+      (monthlyCategory[month][item.category] || 0) + item.amount;
   });
 
   return (
@@ -78,25 +77,22 @@ export default function HomePage() {
         <h2>Total: ₹ {total}</h2>
       </div>
 
-      {/* MONTHLY ANALYSIS */}
+      {/* MONTHLY CATEGORY ANALYSIS */}
       <h2>Monthly Analysis</h2>
-      <div className="monthly-analysis">
-        {Object.entries(monthlyTotals).map(([month, amount]) => (
-          <div key={month} className="month-card">
-            {month}: ₹ {amount}
-          </div>
-        ))}
-      </div>
 
-      {/* CATEGORY ANALYSIS */}
-      <h2>Category Analysis</h2>
-      <div className="monthly-analysis">
-        {Object.entries(categoryTotals).map(([cat, amount]) => (
-          <div key={cat} className="month-card">
-            {cat}: ₹ {amount}
-          </div>
-        ))}
-      </div>
+      {Object.entries(monthlyCategory).map(([month, categories]) => (
+        <div key={month} className="month-card">
+
+          <h3>{month}</h3>
+
+          {Object.entries(categories).map(([cat, amount]) => (
+            <p key={cat}>
+              {cat} : ₹ {amount}
+            </p>
+          ))}
+
+        </div>
+      ))}
 
       {/* EXPENSE GRID */}
       <div className="expense-grid">
