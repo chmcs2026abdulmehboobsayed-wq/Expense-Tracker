@@ -70,7 +70,7 @@ export default function HomePage() {
   expenses.forEach((item) => {
 
     const month = new Date(item.date).toLocaleString("default", {
-      month: "short",
+      month: "long",
     });
 
     if (!monthlyCategory[month]) {
