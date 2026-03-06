@@ -4,6 +4,7 @@ import ExpenseCard from "../components/ExpenseCard";
 import toast from "react-hot-toast";
 
 export default function HomePage() {
+
   const [expenses, setExpenses] = useState([]);
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
@@ -22,7 +23,7 @@ export default function HomePage() {
     fetchExpenses();
   }, []);
 
-  // DELETE
+  // DELETE EXPENSE
   const handleDelete = async () => {
     try {
       await axiosInstance.delete(`/expenses/${deleteId}`);
@@ -34,7 +35,7 @@ export default function HomePage() {
     }
   };
 
-  // UPDATE
+  // UPDATE EXPENSE
   const handleUpdate = async (e) => {
     e.preventDefault();
 
@@ -48,13 +49,26 @@ export default function HomePage() {
     }
   };
 
-  // TOTAL
+  // TOTAL EXPENSE
   const total = expenses.reduce((sum, item) => sum + item.amount, 0);
+
+  // MONTHLY TOTAL
+  const monthlyTotals = {};
+  expenses.forEach((item) => {
+
+    const month = new Date(item.date).toLocaleString("default", {
+      month: "short",
+    });
+
+    monthlyTotals[month] = (monthlyTotals[month] || 0) + item.amount;
+
+  });
 
   // MONTH + CATEGORY ANALYSIS
   const monthlyCategory = {};
 
   expenses.forEach((item) => {
+
     const month = new Date(item.date).toLocaleString("default", {
       month: "short",
     });
@@ -63,11 +77,16 @@ export default function HomePage() {
       monthlyCategory[month] = {};
     }
 
-    monthlyCategory[month][item.category] =
-      (monthlyCategory[month][item.category] || 0) + item.amount;
+    if (!monthlyCategory[month][item.category]) {
+      monthlyCategory[month][item.category] = 0;
+    }
+
+    monthlyCategory[month][item.category] += item.amount;
+
   });
 
   return (
+
     <div className="home-container">
 
       <h1>Personal Expense Tracker</h1>
@@ -77,38 +96,64 @@ export default function HomePage() {
         <h2>Total: ₹ {total}</h2>
       </div>
 
-      {/* MONTHLY CATEGORY ANALYSIS */}
+      {/* MONTHLY TOTAL */}
       <h2>Monthly Analysis</h2>
 
-      {Object.entries(monthlyCategory).map(([month, categories]) => (
-        <div key={month} className="month-card">
+      <div className="monthly-analysis">
+        {Object.entries(monthlyTotals).map(([month, amount]) => (
+          <div key={month} className="month-card">
+            {month}: ₹ {amount}
+          </div>
+        ))}
+      </div>
 
-          <h3>{month}</h3>
 
-          {Object.entries(categories).map(([cat, amount]) => (
-            <p key={cat}>
-              {cat} : ₹ {amount}
-            </p>
-          ))}
+      {/* MONTHLY CATEGORY ANALYSIS */}
+      <h2>Monthly Category Analysis</h2>
 
-        </div>
-      ))}
+      <div className="monthly-analysis">
+
+        {Object.entries(monthlyCategory).map(([month, categories]) => (
+
+          <div key={month} className="month-card">
+
+            <h3>{month}</h3>
+
+            {Object.entries(categories).map(([cat, amount]) => (
+              <p key={cat}>
+                {cat}: ₹ {amount}
+              </p>
+            ))}
+
+          </div>
+
+        ))}
+
+      </div>
+
 
       {/* EXPENSE GRID */}
       <div className="expense-grid">
+
         {expenses.map((item) => (
+
           <ExpenseCard
             key={item._id}
             item={item}
             onEdit={() => setEditing(item)}
             onDelete={() => setDeleteId(item._id)}
           />
+
         ))}
+
       </div>
+
 
       {/* DELETE MODAL */}
       {deleteId && (
+
         <div className="edit-overlay">
+
           <div className="form-card">
 
             <h3 className="text-lg font-semibold mb-4">
@@ -116,6 +161,7 @@ export default function HomePage() {
             </h3>
 
             <div className="form-btns">
+
               <button onClick={handleDelete}>
                 Yes Delete
               </button>
@@ -123,14 +169,19 @@ export default function HomePage() {
               <button onClick={() => setDeleteId(null)}>
                 Cancel
               </button>
+
             </div>
 
           </div>
+
         </div>
+
       )}
+
 
       {/* EDIT MODAL */}
       {editing && (
+
         <div className="edit-overlay">
 
           <form className="form-card" onSubmit={handleUpdate}>
@@ -176,7 +227,10 @@ export default function HomePage() {
           </form>
 
         </div>
+
       )}
+
     </div>
+
   );
 }
