@@ -61,6 +61,13 @@ export default function HomePage() {
     monthlyTotals[month] = (monthlyTotals[month] || 0) + item.amount;
   });
 
+  // CATEGORY ANALYSIS
+  const categoryTotals = {};
+  expenses.forEach((item) => {
+    categoryTotals[item.category] =
+      (categoryTotals[item.category] || 0) + item.amount;
+  });
+
   return (
     <div className="home-container">
 
@@ -72,10 +79,21 @@ export default function HomePage() {
       </div>
 
       {/* MONTHLY ANALYSIS */}
+      <h2>Monthly Analysis</h2>
       <div className="monthly-analysis">
         {Object.entries(monthlyTotals).map(([month, amount]) => (
           <div key={month} className="month-card">
             {month}: ₹ {amount}
+          </div>
+        ))}
+      </div>
+
+      {/* CATEGORY ANALYSIS */}
+      <h2>Category Analysis</h2>
+      <div className="monthly-analysis">
+        {Object.entries(categoryTotals).map(([cat, amount]) => (
+          <div key={cat} className="month-card">
+            {cat}: ₹ {amount}
           </div>
         ))}
       </div>
